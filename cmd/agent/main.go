@@ -106,13 +106,17 @@ func messageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) {
 		}
 	}
 
-	message_content := strings.Trim(re.ReplaceAllString(message.Content, ""), " ")
-	parts := strings.SplitN(message_content, " ", 2)
-	first := parts[0]
+	first := ""
 	rest := ""
-	if len(parts) > 1 {
-		rest = parts[1]
+	if strings.EqualFold(strings.SplitN(message.Content, " ", 2)[0], "letredin") {
+		message_content := strings.Trim(re.ReplaceAllString(message.Content, ""), " ")
+		parts := strings.SplitN(message_content, " ", 2)
+		first = parts[0]
+		if len(parts) > 1 {
+			rest = parts[1]
+		}
 	}
+
 	if !message.Author.Bot || (len(message.MentionRoles) > 0 || strings.EqualFold(first, "letredin")) {
 		if message.ChannelID == channelID.ID {
 			if message.Content == "ping" {
