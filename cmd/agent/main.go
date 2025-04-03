@@ -107,8 +107,8 @@ func messageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) {
 	}
 
 	// Another special case
-	if len(message.MentionRoles) > 0 {
-		message_content := strings.Trim(re.ReplaceAllString(message.Content, ""), " ")
+	message_content := strings.Trim(re.ReplaceAllString(message.Content, ""), " ")
+	if len(message.MentionRoles) > 0 || strings.EqualFold(strings.SplitN(message_content, " ", 2)[0], "letredin") {
 		// PUT THIS IS A FUNCTION\
 		if message.ChannelID == channelID.ID {
 			fmt.Println(strings.SplitN(message_content, " ", 2)[1])
