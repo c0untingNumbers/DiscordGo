@@ -455,16 +455,18 @@ func guimessageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) 
 
 	// whats really happening here is that the bot is supposed to see the commands from a channel under the "all" category
 	channel, _ := dg.Channel(message.ChannelID)
-	if channel.ParentID != "" {
-		category, _ := dg.Channel(channel.ParentID)
-		if category != nil && category.Name == "all" {
-			channels, _ := dg.GuildChannels(util.ServerID)
-			for _, channelToCheck := range channels {
-				if channelToCheck.Type == discordgo.ChannelTypeGuildText && strings.EqualFold(channelToCheck.Name, channel.Name) {
-					cat, _ := dg.Channel(channelToCheck.ParentID)
-					if cat != nil && cat.Name != "all" {
-						log.Info("Sending command to: " + channelToCheck.Name + " in " + cat.Name)
-						dg.ChannelMessageSend(channelToCheck.ID, "letredin "+message.Content)
+	if channel != nil {
+		if channel.ParentID != "" {
+			category, _ := dg.Channel(channel.ParentID)
+			if category != nil && category.Name == "all" {
+				channels, _ := dg.GuildChannels(util.ServerID)
+				for _, channelToCheck := range channels {
+					if channelToCheck.Type == discordgo.ChannelTypeGuildText && strings.EqualFold(channelToCheck.Name, channel.Name) {
+						cat, _ := dg.Channel(channelToCheck.ParentID)
+						if cat != nil && cat.Name != "all" {
+							log.Info("Sending command to: " + channelToCheck.Name + " in " + cat.Name)
+							dg.ChannelMessageSend(channelToCheck.ID, "letredin "+message.Content)
+						}
 					}
 				}
 			}

