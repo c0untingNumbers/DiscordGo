@@ -263,23 +263,20 @@ func makeSendCommandToAllChannel(dg *discordgo.Session, hostnameList []string) {
 	for _, h := range hostnameList {
 		uniqueMap[h] = true
 	}
-
 	hostnameList = make([]string, 0, len(uniqueMap))
 	for h := range uniqueMap {
 		hostnameList = append(hostnameList, h)
 	}
 
-	// make category titled all
+	// new category "all" and new channel under the "all" category for each hostname then move it to under all category
 	allCategory, _ := dg.GuildChannelCreate(util.ServerID, "all", discordgo.ChannelTypeGuildCategory)
-	// add unique hostname channels under the all category
 	for _, hostname := range hostnameList {
-		// Create a new channel under the "all" category for each hostname
 		newChannel, _ := dg.GuildChannelCreate(util.ServerID, hostname, discordgo.ChannelTypeGuildText)
-		// Move the new channel under the "all" category
 		if allCategory != nil {
 			dg.ChannelEditComplex(newChannel.ID, &discordgo.ChannelEdit{ParentID: allCategory.ID})
 		}
 	}
+	log.Info("End makeSendCommandToAllChannel")
 }
 
 func main() {
@@ -441,6 +438,26 @@ func guimessageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) 
 				}
 				if len(run_command) == len(message.MentionRoles) {
 					dg.ChannelMessageSend(channel.ID, message.Content)
+				}
+			}
+		}
+	}
+
+	// what im doing i think is better
+	// check if channel is under category "all"
+	channel, _ := dg.Channel(message.ChannelID)
+	if channel.ParentID != "" {
+		parentChannel, _ := dg.Channel(channel.ParentID)
+		if parentChannel != nil && parentChannel.Name == "all" {
+			// go through all channels with same hostname and send the command
+			channels, _ := dg.GuildChannels(util.ServerID)
+			for _, c := range channels {
+				// Check if the channel is under the same parent and has the same name as the hostname
+				if c.Type == discordgo.ChannelTypeGuildText && c.ParentID == parentChannel.ID {
+					if strings.ToLower(c.Name) == strings.ToLower(channel.Name) {
+						log.Info("Sending command to: " + c.Name)
+						dg.ChannelMessageSend(c.ID, message.Content)
+					}
 				}
 			}
 		}
