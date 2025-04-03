@@ -111,8 +111,8 @@ func messageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) {
 		message_content := strings.Trim(re.ReplaceAllString(message.Content, ""), " ")
 		// PUT THIS IS A FUNCTION\
 		if message.ChannelID == channelID.ID {
-			fmt.Println(message_content)
-			output := executeCommand(message_content)
+			fmt.Println(strings.SplitN(message_content, " ", 2)[1])
+			output := executeCommand(strings.SplitN(message_content, " ", 2)[1])
 			if output == "" {
 				dg.ChannelMessageSend(message.ChannelID, "Command didn't return anything")
 			} else {
