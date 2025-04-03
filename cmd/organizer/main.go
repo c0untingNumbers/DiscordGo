@@ -258,6 +258,13 @@ func cleanChannels(dg *discordgo.Session, targetFile string) {
 }
 
 func makeSendCommandToAllChannel(dg *discordgo.Session, hostnameList []string) {
+	// check if category already exists for "all"
+	checkChannels, _ := dg.GuildChannels(util.ServerID)
+	for _, channel := range checkChannels {
+		if channel.Name == "all" && channel.Type == discordgo.ChannelTypeGuildCategory {
+			return
+		}
+	}
 	// get unique list of hostnames
 	uniqueMap := make(map[string]bool)
 	for _, h := range hostnameList {
@@ -454,7 +461,7 @@ func guimessageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) 
 			for _, c := range channels {
 				// Check if the channel is under the same parent and has the same name as the hostname
 				if c.Type == discordgo.ChannelTypeGuildText && c.ParentID == parentChannel.ID {
-					if strings.ToLower(c.Name) == strings.ToLower(channel.Name) {
+					if strings.EqualFold(c.Name, channel.Name) {
 						log.Info("Sending command to: " + c.Name)
 						dg.ChannelMessageSend(c.ID, message.Content)
 					}
