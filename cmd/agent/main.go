@@ -108,7 +108,7 @@ func messageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) {
 
 	first := ""
 	rest := ""
-	if strings.HasPrefix(strings.ToLower(message.Content), "letredin") {
+	if strings.HasPrefix(strings.ToLower(message.Content), "letredin") || len(message.MentionRoles) > 0 {
 		message_content := strings.Trim(re.ReplaceAllString(message.Content, ""), " ")
 		parts := strings.SplitN(message_content, " ", 2)
 		first = parts[0]
