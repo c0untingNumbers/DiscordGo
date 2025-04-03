@@ -257,12 +257,39 @@ func cleanChannels(dg *discordgo.Session, targetFile string) {
 	log.Info("End Clean")
 }
 
+func makeSendCommandToAllChannel(dg *discordgo.Session, hostnameList []string) {
+	// get unique list of hostnames
+	uniqueMap := make(map[string]bool)
+	for _, h := range hostnameList {
+		uniqueMap[h] = true
+	}
+
+	hostnameList = make([]string, 0, len(uniqueMap))
+	for h := range uniqueMap {
+		hostnameList = append(hostnameList, h)
+	}
+
+	// make category titled all
+	allCategory, _ := dg.GuildChannelCreate(util.ServerID, "all", discordgo.ChannelTypeGuildCategory)
+	// add unique hostname channels under the all category
+	for _, hostname := range hostnameList {
+		// Create a new channel under the "all" category for each hostname
+		newChannel, _ := dg.GuildChannelCreate(util.ServerID, hostname, discordgo.ChannelTypeGuildText)
+		// Move the new channel under the "all" category
+		if allCategory != nil {
+			dg.ChannelEditComplex(newChannel.ID, &discordgo.ChannelEdit{ParentID: allCategory.ID})
+		}
+	}
+}
+
 func main() {
 	targetMap, teams, hostnameList, osList = parseCSV(fileInputPtr)
 
 	createOrDeleteRoles(dg, true)
 
 	cleanChannels(dg, fileInputPtr)
+
+	makeSendCommandToAllChannel(dg, hostnameList)
 
 	dg.AddHandler(guimessageCreater)
 	dg.AddHandler(slashCommandHandler)
