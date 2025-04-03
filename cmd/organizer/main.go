@@ -254,6 +254,8 @@ func cleanChannels(dg *discordgo.Session, targetFile string) {
 			}
 		}
 	}
+
+	makeSendCommandToAllChannel(dg, hostnameList)
 	log.Info("End Clean")
 }
 
