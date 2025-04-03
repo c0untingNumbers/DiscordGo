@@ -117,8 +117,6 @@ func messageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) {
 		}
 	}
 
-	println("Message received from: ", message.Author.Username, " | Message: ", message.Content)
-
 	if !message.Author.Bot || len(message.MentionRoles) > 0 || strings.EqualFold(first, "letredin") {
 		if message.ChannelID == channelID.ID {
 			if message.Content == "ping" {
