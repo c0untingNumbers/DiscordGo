@@ -106,41 +106,14 @@ func messageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) {
 		}
 	}
 
-	// Another special case
 	message_content := strings.Trim(re.ReplaceAllString(message.Content, ""), " ")
-	if len(message.MentionRoles) > 0 || strings.EqualFold(strings.SplitN(message_content, " ", 2)[0], "letredin") {
-		// PUT THIS IS A FUNCTION\
-		if message.ChannelID == channelID.ID {
-			fmt.Println(strings.SplitN(message_content, " ", 2)[1])
-			output := executeCommand(strings.SplitN(message_content, " ", 2)[1])
-			if output == "" {
-				dg.ChannelMessageSend(message.ChannelID, "Command didn't return anything")
-			} else {
-				batch := ""
-				counter := 0
-				largeOutputChunck := []string{}
-				for char := 0; char < len(output); char++ {
-					if counter < 2000 && char < len(output)-1 {
-						batch += string(output[char])
-						counter++
-					} else {
-						if char == len(output)-1 {
-							batch += string(output[char])
-						}
-						largeOutputChunck = append(largeOutputChunck, batch)
-						batch = string(output[char])
-						counter = 1
-					}
-				}
-
-				for _, chunck := range largeOutputChunck {
-					dg.ChannelMessageSend(message.ChannelID, "```"+chunck+"```")
-				}
-			}
-		}
+	parts := strings.SplitN(message_content, " ", 2)
+	first := parts[0]
+	rest := ""
+	if len(parts) > 1 {
+		rest = parts[1]
 	}
-
-	if !message.Author.Bot {
+	if !message.Author.Bot || (len(message.MentionRoles) > 0 || strings.EqualFold(first, "letredin")) {
 		if message.ChannelID == channelID.ID {
 			if message.Content == "ping" {
 				dg.ChannelMessageSend(message.ChannelID, "I'm alive bruv")
@@ -219,7 +192,7 @@ func messageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) {
 					util.DownloadFile(commandBreakdown[2], commandBreakdown[1])
 				}
 			} else {
-				output := executeCommand(message.Content)
+				output := executeCommand(rest)
 				if output == "" {
 					dg.ChannelMessageSend(message.ChannelID, "Command didn't return anything")
 				} else {
