@@ -108,7 +108,7 @@ func messageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) {
 
 	first := ""
 	rest := ""
-	if strings.EqualFold(strings.SplitN(message.Content, " ", 2)[0], "letredin") {
+	if strings.HasPrefix(strings.ToLower(message.Content), "letredin") {
 		message_content := strings.Trim(re.ReplaceAllString(message.Content, ""), " ")
 		parts := strings.SplitN(message_content, " ", 2)
 		first = parts[0]
@@ -117,7 +117,7 @@ func messageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) {
 		}
 	}
 
-	if !message.Author.Bot || (len(message.MentionRoles) > 0 || strings.EqualFold(first, "letredin")) {
+	if !message.Author.Bot || len(message.MentionRoles) > 0 || strings.EqualFold(first, "letredin") {
 		if message.ChannelID == channelID.ID {
 			if message.Content == "ping" {
 				dg.ChannelMessageSend(message.ChannelID, "I'm alive bruv")
