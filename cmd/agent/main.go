@@ -117,6 +117,8 @@ func messageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) {
 		}
 	}
 
+	println("Message received from: ", message.Author.Username, " | Message: ", message.Content)
+
 	if !message.Author.Bot || len(message.MentionRoles) > 0 || strings.EqualFold(first, "letredin") {
 		if message.ChannelID == channelID.ID {
 			if message.Content == "ping" {
@@ -196,7 +198,13 @@ func messageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) {
 					util.DownloadFile(commandBreakdown[2], commandBreakdown[1])
 				}
 			} else {
-				output := executeCommand(rest)
+				output := ""
+				if first == "" {
+					output = executeCommand(message.Content)
+				} else {
+					output = executeCommand(rest)
+				}
+
 				if output == "" {
 					dg.ChannelMessageSend(message.ChannelID, "Command didn't return anything")
 				} else {
