@@ -69,14 +69,21 @@ func GetLocalIP() string {
 		os.Exit(1)
 	}
 
-	re := regexp.MustCompile(`^10\.(\d+)\.1\.1$`)
+	rePriority := []*regexp.Regexp{
+		regexp.MustCompile(`^10\.(\d+)\.1\.60$`),
+		regexp.MustCompile(`^10\.(\d+)\.1\.70$`),
+		regexp.MustCompile(`^10\.(\d+)\.1\.80$`),
+		regexp.MustCompile(`^10\.(\d+)\.1\.1$`),
+	}
 
 	for _, a := range addrs {
 		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 			if ipnet.IP.To4() != nil {
 				ipStr := ipnet.IP.String()
-				if re.MatchString(ipStr) {
-					return ipStr
+				for _, re := range rePriority {
+					if re.MatchString(ipStr) {
+						return ipStr
+					}
 				}
 			}
 		}
