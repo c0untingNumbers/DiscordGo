@@ -78,7 +78,6 @@ func GetLocalIP() string {
 				if re.MatchString(ipStr) {
 					return ipStr
 				}
-				return ipnet.IP.String()
 			}
 		}
 	}
