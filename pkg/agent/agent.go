@@ -3,7 +3,7 @@ package agent
 import (
 	"net"
 	"os"
-	"strings"
+	"regexp"
 )
 
 // DEBUG is set to true, lots of print statement
@@ -68,11 +68,14 @@ func GetLocalIP() string {
 		os.Stderr.WriteString("Oops: " + err.Error() + "\n")
 		os.Exit(1)
 	}
+
+	re := regexp.MustCompile(`^10\.(\d+)\.1\.1$`)
+
 	for _, a := range addrs {
 		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 			if ipnet.IP.To4() != nil {
 				ipStr := ipnet.IP.String()
-				if strings.HasPrefix(ipStr, "10.") {
+				if re.MatchString(ipStr) {
 					return ipStr
 				}
 				return ipnet.IP.String()
