@@ -3,7 +3,6 @@ package agent
 import (
 	"net"
 	"os"
-	"strings"
 )
 
 // DEBUG is set to true, lots of print statement
@@ -71,10 +70,7 @@ func GetLocalIP() string {
 	for _, a := range addrs {
 		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 			if ipnet.IP.To4() != nil {
-				ipStr := ipnet.IP.String()
-				if strings.HasPrefix(ipStr, "172.16") {
-					return ipStr
-				}
+				return ipnet.IP.String()
 			}
 		}
 	}
