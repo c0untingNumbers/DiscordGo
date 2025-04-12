@@ -306,9 +306,14 @@ func main() {
 		return
 	}
 
+	user, err := dg.User("@me")
+	if err != nil {
+		log.Fatalf("Failed to get bot user: %v", err)
+	}
+
 	// Register slash commands
 	for _, v := range commands {
-		_, err := dg.ApplicationCommandCreate(dg.State.User.ID, util.ServerID, v)
+		_, err := dg.ApplicationCommandCreate(user.ID, util.ServerID, v)
 		if err != nil {
 			log.Panicf("Cannot create '%v' command: %v", v.Name, err)
 		}
